@@ -1,0 +1,23 @@
+# K3s server configuration
+write-kubeconfig-mode: "0644"
+tls-san:
+  - "k3s.yourdomain.com"
+  - "192.168.1.100"  # Your server IP
+node-ip: "192.168.1.100"
+node-external-ip: "192.168.1.100"
+cluster-cidr: "10.42.0.0/16"
+service-cidr: "10.43.0.0/16"
+cluster-dns: "10.43.0.10"
+flannel-backend: "wireguard-native"
+disable:
+  - traefik  # We'll install our own Traefik
+  - servicelb
+  - local-storage
+kubelet-arg:
+  - "max-pods=100"
+  - "eviction-hard=memory.available<500Mi"
+  - "image-gc-high-threshold=80"
+  - "image-gc-low-threshold=60"
+kube-controller-manager-arg:
+  - "terminated-pod-gc-threshold=10"
+

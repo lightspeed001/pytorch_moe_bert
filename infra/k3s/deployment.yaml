@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bert-moe-deployment
+  labels:
+    app: bert-moe
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bert-moe
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: bert-moe
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+    spec:
+      containers:
+      - name: bert-moe
+        image: ${REGISTRY}/bert-moe:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: MODEL_PATH
+          value: "/app/bert_moe.onnx"
+        - name: LOG_LEVEL
+          value: "INFO"
+        resources:
+          limits:
+            cpu: "4"
+            memory: "8Gi"
+            nvidia.com/gpu: 1  # If using GPU
+          requests:
+            cpu: "2"
+            memory: "4Gi"
+            nvidia.com/gpu: 1  # If using GPU
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: model-storage
+          mountPath: /app/bert_moe.onnx
+          subPath: bert_moe.onnx
+      volumes:
+      - name: model-storage
+        persistentVolumeClaim:
+          claimName: model-pvc
+      nodeSelector:
+        accelerator: nvidia  # If using GPU
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bert-moe-service
+spec:
+  selector:
+    app: bert-moe
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: model-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+

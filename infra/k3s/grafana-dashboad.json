@@ -1,0 +1,38 @@
+{
+  "dashboard": {
+    "title": "BERT-MOE Model Serving",
+    "panels": [
+      {
+        "title": "Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[1m])",
+            "legendFormat": "Requests per second"
+          }
+        ]
+      },
+      {
+        "title": "Latency",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "95th percentile"
+          }
+        ]
+      },
+      {
+        "title": "GPU Utilization",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "avg_over_time(nvidia_gpu_utilization[1m])",
+            "legendFormat": "GPU Utilization"
+          }
+        ]
+      }
+    ]
+  }
+}
+
