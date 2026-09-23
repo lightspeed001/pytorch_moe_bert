@@ -1,0 +1,22 @@
+# gke-iam.yaml
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPolicyMember
+metadata:
+  name: gke-workload-identity
+spec:
+  member: serviceAccount:your-gcp-project-id.svc.id.goog[model-serving/bert-moe-service-account]
+  role: roles/iam.workloadIdentityUser
+  resourceRef:
+    apiVersion: iam.cnrm.cloud.google.com/v1beta1
+    kind: IAMServiceAccount
+    name: model-serving-sa
+---
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMServiceAccount
+metadata:
+  name: model-serving-sa
+  annotations:
+    cnrm.cloud.google.com/project-id: "your-gcp-project-id"
+spec:
+  displayName: "Model Serving Service Account"
+

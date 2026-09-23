@@ -1,0 +1,36 @@
+# gke-monitoring.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: bert-moe-monitor
+spec:
+  selector:
+    matchLabels:
+      app: bert-moe
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: bert-moe-pod-monitor
+spec:
+  selector:
+    matchLabels:
+      app: bert-moe
+  podMetricsEndpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+---
+apiVersion: logging.cnrm.cloud.google.com/v1beta1
+kind: LoggingLogSink
+metadata:
+  name: bert-moe-log-sink
+spec:
+  destination: logging.googleapis.com/projects/your-gcp-project-id/locations/global/buckets/_Default
+  filter: 'resource.type="k8s_container" AND resource.labels.namespace_name="model-serving" AND resource.labels.pod_name:"bert-moe"'
+  uniqueWriterIdentity: true
+

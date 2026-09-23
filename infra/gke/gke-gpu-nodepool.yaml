@@ -1,0 +1,36 @@
+# gke-gpu-nodepool.yaml
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerNodePool
+metadata:
+  name: gpu-nodepool
+  annotations:
+    cnrm.cloud.google.com/project-id: "your-gcp-project-id"
+spec:
+  location: us-central1-a
+  clusterRef:
+    name: bert-moe-cluster
+  initialNodeCount: 2
+  nodeConfig:
+    machineType: n1-standard-4
+    acceleratorType: nvidia-tesla-t4
+    acceleratorCount: 1
+    diskSizeGb: 100
+    diskType: pd-ssd
+    oauthScopes:
+      - "https://www.googleapis.com/auth/cloud-platform"
+    labels:
+      accelerator: nvidia
+      app: bert-moe
+      environment: production
+    tags:
+      - gke-node
+      - gpu-node
+    workloadMetadataConfig:
+      mode: GKE_METADATA
+  autoscaling:
+    minNodeCount: 2
+    maxNodeCount: 8
+  management:
+    autoRepair: true
+    autoUpgrade: true
+

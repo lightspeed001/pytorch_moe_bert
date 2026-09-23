@@ -1,0 +1,41 @@
+# gke-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bert-moe-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    networking.gke.io/managed-certificates: "bert-moe-cert"
+    kubernetes.io/ingress.global-static-ip-name: "bert-moe-ip"
+    networking.gke.io/v1beta1.FrontendConfig: "bert-moe-frontend-config"
+spec:
+  rules:
+  - host: model.yourdomain.com
+    http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: bert-moe-service
+            port:
+              number: 80
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: bert-moe-frontend-config
+spec:
+  sslPolicy: gke-ssl-policy
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: bert-moe-cert
+spec:
+  domains:
+    - model.yourdomain.com
+

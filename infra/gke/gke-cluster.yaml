@@ -1,0 +1,63 @@
+# gke-cluster.yaml
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: bert-moe-cluster
+  annotations:
+    cnrm.cloud.google.com/project-id: "your-gcp-project-id"
+spec:
+  location: us-central1-a
+  initialNodeCount: 3
+  nodeConfig:
+    machineType: n1-standard-4
+    diskSizeGb: 100
+    diskType: pd-ssd
+    oauthScopes:
+      - "https://www.googleapis.com/auth/cloud-platform"
+    labels:
+      app: bert-moe
+      environment: production
+    tags:
+      - gke-node
+    workloadMetadataConfig:
+      mode: GKE_METADATA
+  nodePoolAutoscaling:
+    enabled: true
+    minNodeCount: 3
+    maxNodeCount: 10
+  clusterAutoscaling:
+    enabled: true
+    resourceLimits:
+      - resourceType: "cpu"
+        minimum: 3
+        maximum: 50
+      - resourceType: "memory"
+        minimum: 12
+        maximum: 200
+  addonsConfig:
+    httpLoadBalancing:
+      disabled: false
+    horizontalPodAutoscaling:
+      disabled: false
+    cloudRunConfig:
+      disabled: true
+    dnsCacheConfig:
+      enabled: true
+  networkingMode: VPC_NATIVE
+  ipAllocationPolicy:
+    clusterSecondaryRangeName: pods-range
+    servicesSecondaryRangeName: services-range
+  privateClusterConfig:
+    enablePrivateNodes: true
+    enablePrivateEndpoint: false
+    masterGlobalAccessConfig:
+      enabled: true
+  releaseChannel:
+    channel: REGULAR
+  workloadIdentityConfig:
+    workloadPool: "your-gcp-project-id.svc.id.goog"
+  databaseEncryption:
+    state: DECRYPTED
+  binaryAuthorization:
+    enabled: true
+

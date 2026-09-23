@@ -1,0 +1,27 @@
+# gke-storage.yaml
+apiVersion: compute.cnrm.cloud.google.com/v1beta1
+kind: ComputePersistentDisk
+metadata:
+  name: model-disk
+  annotations:
+    cnrm.cloud.google.com/project-id: "your-gcp-project-id"
+spec:
+  size: 20
+  type: pd-ssd
+  zone: us-central1-a
+---
+apiVersion: storage.cnrm.cloud.google.com/v1beta1
+kind: StoragePersistentVolumeClaim
+metadata:
+  name: model-pvc
+  annotations:
+    cnrm.cloud.google.com/project-id: "your-gcp-project-id"
+spec:
+  storageClassName: standard-rwo
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: model-disk
+
