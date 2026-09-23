@@ -1,0 +1,41 @@
+graph TD
+    subgraph "GKE Cluster"
+        A[Control Plane] --> B[Node Pool 1: CPU]
+        A --> C[Node Pool 2: GPU]
+        B --> D[Model Pod 1]
+        B --> E[Model Pod 2]
+        C --> F[Model Pod 3]
+        C --> G[Model Pod 4]
+    end
+
+    subgraph "GCP Services"
+        H[Cloud Load Balancer] --> I[Ingress Controller]
+        I --> D
+        I --> E
+        I --> F
+        I --> G
+        J[Persistent Disk] --> K[Model PVC]
+        K --> D
+        K --> E
+        K --> F
+        K --> G
+        L[Cloud Monitoring] --> M[Metrics]
+        D -->|Metrics| L
+        E -->|Metrics| L
+        F -->|Metrics| L
+        G -->|Metrics| L
+    end
+
+    subgraph "Security"
+        N[Workload Identity] --> O[Service Account]
+        O --> D
+        O --> E
+        O --> F
+        O --> G
+        P[Binary Authorization] --> Q[Image Verification]
+    end
+
+    style A fill:#f9f,stroke:#333
+    style H fill:#bbf,stroke:#333
+    style L fill:#9f9,stroke:#333
+    style N fill:#ff9,stroke:#333

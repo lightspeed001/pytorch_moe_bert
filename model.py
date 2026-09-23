@@ -1,4 +1,6 @@
-# PyTorch Mixture of Experts (MOE) Model with BERT Scale
+# PyTorch Mixture of Experts (MOE) Model with BERT Scale :)
+# model assumes classification task (adjust the classifier for other tasks)
+# Scale up the model by increasing the number of layers, experts or hidden dimensions
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -126,4 +128,81 @@ class BertMoE(nn.Module):
 
     # Output layer
     self.classifier = nnLinear(config.hidden_size, config.num_labels)
-    
+
+  def forward(self, input_ids, attention_mask=None, token_type_ids=None, labels=None):
+    # BERT encoder
+    outputs = self.bert(
+      input_ids = input_ids,
+      attention_mask=attention_mask,
+      token_type_ids=token_type_ids
+    )
+    sequence_output = outputs.last_hidden_state
+
+    # MOE layer (applied to each token)
+    moe_output = self.moe(sequence_output)
+
+    # Pooling (CLS token)
+    pooled_output = moe_output[:, 0, :]
+
+    # Classifier
+    logits = self.classifier(pooled_output)
+
+    return logits
+
+#  Example Configuration
+class BertMoEConfig:
+  def __init__(self):
+    # BERT base configuration
+    self.vocab_size = 30522
+    self.hidden_size = 768
+    self.num_hidden_layers = 12
+    self.num_attention_heads = 12
+    self.intermediate_size = 3072
+    self.hidden_act = "gelu"
+    self.hidden_dropout_prob = 0.1
+    self.max_position_embeddings = 512
+    self.type_vocab_size = 2
+    self.initializer_range = 0.02
+    self.layer_norm_eps = 1e-12
+
+    # MOE specific
+    self.num_experts - 8
+    self.moe_expert_hidden_size = 3072
+    self.moe_top_k = 2
+    self.moe_noisy_gating = True
+
+    #Task specific
+    self.num_labels = 2
+
+# Create model
+config = BertMoEConfig()
+model = BertMoE(config)
+
+# Example input
+input_ids = torch.randint(0, config.vocab_size, (2, 128)) #batch_size=2, seq_len=128
+attention_mask = torch.ones_like(input_ids)
+token_type_ids = torch.zeros_like(input_ids)
+
+# Export to ONNX
+dummy_input = {
+  "input_ids" : torch.zeros((1, 128), dtype=torch.long),
+  "attention_mask": torch.ones((1, 128), dtype=torch.long),
+  "token_type_ids": torch.zeros((1, 128), dtype=torch.long)
+}
+
+torch.onnx.export(
+  model,
+  (dummy_input["input_ids"], dummy_nput["attention_mask"], dummy_input["token_type_ids"]),
+  "bert_moe.onnx",
+  input_names=["input_ids", "attention_mask", "token_type_ids"],
+  output_names=["output"],
+  dynamic_axes={
+    "input_ids": {0: "batch_size", 1: "sequence_length"},
+    "attention_mask": {0, "batch_size", 1: "sequence_length"},
+    "token_type_ids": {0: "batch_size", 1: "sequnce_length"},
+    "output": {0: "batch_size"}
+  },
+  opset_version=13
+)
+
+print("Model exported to ONNX format")

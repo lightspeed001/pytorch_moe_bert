@@ -1,0 +1,24 @@
+graph TD
+    subgraph "GKE Networking"
+        A[External Traffic] --> B[GCP Load Balancer]
+        B --> C[Ingress Controller]
+        C --> D[Model Service]
+        D --> E[Model Pods]
+        F[Internal Traffic] --> G[ClusterIP Services]
+        G --> E
+    end
+
+    subgraph "GCP Networking"
+        H[VPC Network] --> I[Subnet]
+        I --> J[Node Pools]
+        J --> E
+    end
+
+    subgraph "Security"
+        K[Network Policies] --> L[Pod-to-Pod Traffic]
+        M[Firewall Rules] --> N[External Access]
+    end
+
+    style A fill:#f9f,stroke:#333
+    style B fill:#bbf,stroke:#333
+    style K fill:#ff9,stroke:#333

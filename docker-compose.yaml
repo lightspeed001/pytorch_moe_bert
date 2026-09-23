@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  model-server:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./bert_moe.onnx:/app/bert_moe.onnx
+    environment:
+      - MODEL_PATH=/app/bert_moe.onnx
+      - LOG_LEVEL=DEBUG
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+

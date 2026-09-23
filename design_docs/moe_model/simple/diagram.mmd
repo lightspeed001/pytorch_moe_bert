@@ -1,0 +1,12 @@
+graph TD
+    A[Input] --> B[BERT Encoder]
+    B --> C[Sequence Output]
+    C --> D[Gating Network]
+    C --> E[Expert 1]
+    C --> F[Expert 2]
+    C --> G[Expert 3]
+    D -->|Weights| H[Weighted Sum]
+    E --> H
+    F --> H
+    G --> H
+    H --> I[Output]

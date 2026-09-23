@@ -1,0 +1,36 @@
+graph TD
+    subgraph "K3s Cluster"
+        A[Master Node] --> B[Worker Node 1]
+        A --> C[Worker Node 2]
+        A --> D[Worker Node 3]
+        B --> E[Model Pod 1]
+        B --> F[Model Pod 2]
+        C --> G[Model Pod 3]
+        D --> H[Model Pod 4]
+    end
+
+    subgraph "External Services"
+        I[Load Balancer] -->|Traffic| J[Ingress Controller]
+        J --> E
+        J --> F
+        J --> G
+        J --> H
+        K[Persistent Storage] --> L[Model PVC]
+        L --> E
+        L --> F
+        L --> G
+        L --> H
+    end
+
+    subgraph "Monitoring Stack"
+        M[Prometheus] --> N[Grafana]
+        M --> O[AlertManager]
+        E -->|Metrics| M
+        F -->|Metrics| M
+        G -->|Metrics| M
+        H -->|Metrics| M
+    end
+
+    style A fill:#f9f,stroke:#333
+    style I fill:#bbf,stroke:#333
+    style M fill:#9f9,stroke:#333

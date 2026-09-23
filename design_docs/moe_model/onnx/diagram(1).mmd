@@ -1,0 +1,9 @@
+graph TD
+    A[ONNX Model] --> B[Input Layer]
+    B --> C[BERT Encoder]
+    C --> D[MoE Layer]
+    D --> E[Output Layer]
+    E --> F[Predictions]
+
+    style A fill:#f9f,stroke:#333
+    style F fill:#bbf,stroke:#333

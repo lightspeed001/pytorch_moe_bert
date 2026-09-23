@@ -1,0 +1,32 @@
+graph TD
+    subgraph Input Layer
+        A[Input IDs] --> B[Attention Mask]
+        A --> C[Token Type IDs]
+    end
+
+    subgraph BERT Encoder
+        B --> D[BERT Transformer Layers]
+        C --> D
+        D --> E[Sequence Output]
+    end
+
+    subgraph MoE Layer
+        E --> F[Gating Network]
+        F -->|Top-k Selection| G[Expert Weights]
+        E --> H[Expert 1]
+        E --> I[Expert 2]
+        E --> J[Expert 3]
+        E --> K[Expert N]
+        G -->|Weighted Sum| L[Combined Output]
+    end
+
+    subgraph Output Layer
+        L --> M[Pooling Layer]
+        M --> N[Classifier]
+        N --> O[Predictions]
+    end
+
+    style A fill:#f9f,stroke:#333
+    style O fill:#bbf,stroke:#333
+    style F fill:#f96,stroke:#333
+    style G fill:#6f9,stroke:#333

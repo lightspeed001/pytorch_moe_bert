@@ -1,0 +1,23 @@
+graph TD
+    subgraph "Networking Stack"
+        A[External Traffic] --> B[MetalLB]
+        B --> C[Traefik Ingress]
+        C --> D[Model Service]
+        D --> E[Model Pods]
+        F[Internal Traffic] --> G[ClusterIP Services]
+        G --> E
+    end
+
+    subgraph "Storage"
+        H[Longhorn] --> I[Model PVC]
+        I --> E
+    end
+
+    subgraph "Monitoring"
+        J[Prometheus] --> K[Grafana]
+        E -->|Metrics| J
+    end
+
+    style A fill:#f9f,stroke:#333
+    style B fill:#bbf,stroke:#333
+    style J fill:#9f9,stroke:#333
