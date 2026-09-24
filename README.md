@@ -45,7 +45,7 @@ graph TD
 - Dropout for regularization
 - GELU activations
 
-**Notes** :notepad:
+**Notes** :notebook:
     
 > For production serving, you may want to add:
 - Batch processing support
@@ -54,6 +54,9 @@ graph TD
 
 > The model assumes a classification task
 > Model can be scaled up by increasing the number of layers, experts, or hidden dimensions
+
+### Model Serving: Kubernetes (k3s) :cloud:
+
 
 ### Model Serving: Kubernetes (k3s) :cloud:
 
